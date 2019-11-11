@@ -8,7 +8,7 @@ import { createAppContainer } from 'react-navigation';
 
 const BottomTab = createBottomTabNavigator({
   MapsTab: {
-    screen : MapsTabScreen
+    screen : MapsTabScreen,
   },
   StreamsTab: {
     screen : ListStreamPoint

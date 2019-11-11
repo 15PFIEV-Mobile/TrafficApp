@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Container,Text,Content,Icon} from 'native-base';
+import Header from '../../components/Header'
 
 export default class ProfileTab extends Component {
     static navigationOptions = {
@@ -9,11 +10,7 @@ export default class ProfileTab extends Component {
     }
     render() {
         return <Container>
-            <Content>
-                <Text>
-                    Profile
-                </Text>
-            </Content>
+                <Header/>
         </Container>
     }
 }
