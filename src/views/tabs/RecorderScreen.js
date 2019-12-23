@@ -14,21 +14,43 @@ export default class RecorderScreen extends Component {
 
     state = {
         recording: false,
-        processing: false
+        processing: false,
+        interval : 0,
     }
 
     takePicture = async() => {
         if (this.camera) {
-          const options = { quality: 0.5, base64: true };
+          const options = { quality: 0.25, base64: true };
           const data = await this.camera.takePictureAsync(options);
           console.log(data.uri);
+          //const result = data.base64; //ready for store base64
         }
     };
 
+    changeRecording = async () => {
+        await this.setState({
+            recording: !this.state.recording
+        })
+        console.log('change to '+this.state.recording)
+    }
+
+    startRecording = async () =>{
+        await this.changeRecording()
+        console.log('start')
+        //this.takePicture()
+        await this.setState({
+            intervalID : setInterval(()=>console.log('Live...'),2000)
+        })
+        console.log(this.state.intervalID)
+    }
+
+    stopRecording = async () =>{
+        await this.changeRecording()
+        console.log('end')
+        clearInterval(this.state.intervalID)
+    }
+
     render() {
-
-        const { recording, processing } = this.state;
-
         return <Container>
             <Header/>
             <View style={styles.container}>
@@ -51,14 +73,17 @@ export default class RecorderScreen extends Component {
                     buttonPositive: 'Ok',
                     buttonNegative: 'Cancel',
                 }}
-                onGoogleVisionBarcodesDetected={({ barcodes }) => {
-                    console.log(barcodes);
-                }}
                 />
                 <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                <Button onPress={this.takePicture.bind(this)} style={styles.capture} rounded warning>
-                    <Text>Snap</Text>
-                </Button>
+                {this.state.recording?
+                    <Button onPress={this.stopRecording} style={styles.capture} rounded iconLeft>
+                        <Icon name='wifi' />
+                        <Text>Live</Text>
+                    </Button>:
+                    <Button onPress={this.startRecording} style={styles.capture} rounded>
+                        <Icon name='aperture' style={styles.iconRecord}/>
+                    </Button>
+                }
                 </View>
             </View>
         </Container>
@@ -81,6 +106,11 @@ const styles = StyleSheet.create({
       //padding: 15,
       //paddingHorizontal: 20,
       alignSelf: 'center',
-      margin: 20,
+      position: "absolute",
+      bottom: 20,
+      height: 75,
     },
+    iconRecord: {
+        fontSize: 50
+    }
 });
