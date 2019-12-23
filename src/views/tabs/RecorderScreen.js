@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import {Container,Text,Button, Icon} from 'native-base';
 import Header from '../../components/Header';
 import {StyleSheet, View} from 'react-native';
-//import CameraRoll from "@react-native-community/cameraroll";
 import { RNCamera } from 'react-native-camera';
+import Geolocation from 'react-native-geolocation-service';
+import * as Permission from '../../services/Permissions';
+import {firebaseApp} from '../../services/ConfigFirebase';
 
 export default class RecorderScreen extends Component {
     static navigationOptions = {
@@ -12,18 +14,38 @@ export default class RecorderScreen extends Component {
         }
     }
 
+    constructor(props){
+        super(props)
+        this.itemsRef = firebaseApp.database().ref('Streams')
+    }
+
+    componentDidMount(){
+        Permission.requestLocationPermission()
+        this.getLocation()
+    }
+
+    setDB = (base64) => {
+        const streamRef = this.itemsRef.child('1')
+        streamRef.update({
+            frame : base64,
+            location: this.state.location
+        })
+        console.log('set..')
+    }
+
     state = {
         recording: false,
         processing: false,
         interval : 0,
+        location : {},
     }
 
-    takePicture = async() => {
+    takePicture = async () => {
         if (this.camera) {
-          const options = { quality: 0.25, base64: true };
-          const data = await this.camera.takePictureAsync(options);
-          console.log(data.uri);
-          //const result = data.base64; //ready for store base64
+            const options = { quality: 0.25, base64: true };
+            const data = await this.camera.takePictureAsync(options);
+            this.setDB(data.base64)
+            console.log('live...')
         }
     };
 
@@ -37,11 +59,24 @@ export default class RecorderScreen extends Component {
     startRecording = async () =>{
         await this.changeRecording()
         console.log('start')
-        //this.takePicture()
-        await this.setState({
-            intervalID : setInterval(()=>console.log('Live...'),2000)
+        this.setState({
+            intervalID : setInterval(()=>this.takePicture(),500)
         })
-        console.log(this.state.intervalID)
+    }
+
+    getLocation = () => {
+        Geolocation.getCurrentPosition(
+            (position) => {
+                this.setState({
+                    location : position.coords
+                })
+            },
+            (error) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
     }
 
     stopRecording = async () =>{
