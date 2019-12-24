@@ -5,7 +5,7 @@ import {StyleSheet, View} from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import Geolocation from 'react-native-geolocation-service';
 import * as Permission from '../../services/Permissions';
-import {firebaseApp} from '../../services/ConfigFirebase';
+import * as connectDB from '../../services/Database';
 
 export default class RecorderScreen extends Component {
     static navigationOptions = {
@@ -14,23 +14,9 @@ export default class RecorderScreen extends Component {
         }
     }
 
-    constructor(props){
-        super(props)
-        this.itemsRef = firebaseApp.database().ref('Streams')
-    }
-
-    componentDidMount(){
-        Permission.requestLocationPermission()
+    async componentDidMount(){
+        await Permission.requestLocationPermission()
         this.getLocation()
-    }
-
-    setDB = (base64) => {
-        const streamRef = this.itemsRef.child('1')
-        streamRef.update({
-            frame : base64,
-            location: this.state.location
-        })
-        console.log('set..')
     }
 
     state = {
@@ -44,7 +30,7 @@ export default class RecorderScreen extends Component {
         if (this.camera) {
             const options = { quality: 0.25, base64: true };
             const data = await this.camera.takePictureAsync(options);
-            this.setDB(data.base64)
+            connectDB.updateDB(data.base64)
             console.log('live...')
         }
     };
@@ -57,6 +43,7 @@ export default class RecorderScreen extends Component {
     }
 
     startRecording = async () =>{
+        connectDB.setDB(this.state.location)
         await this.changeRecording()
         console.log('start')
         this.setState({
