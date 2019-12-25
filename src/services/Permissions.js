@@ -13,6 +13,7 @@ export async function requestLocationPermission() {
         buttonPositive: 'OK',
       },
     );
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA)
     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
       console.log('You can get the location');
     } else {

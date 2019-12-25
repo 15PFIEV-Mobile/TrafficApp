@@ -6,6 +6,7 @@ import { RNCamera } from 'react-native-camera';
 import Geolocation from 'react-native-geolocation-service';
 import * as Permission from '../../services/Permissions';
 import * as connectDB from '../../services/Database';
+import * as Distr from '../../services/Distributed';
 
 export default class RecorderScreen extends Component {
     static navigationOptions = {
@@ -14,9 +15,13 @@ export default class RecorderScreen extends Component {
         }
     }
 
-    async componentDidMount(){
-        await Permission.requestLocationPermission()
+    componentDidMount(){
+        Permission.requestLocationPermission()
         this.getLocation()
+    }
+
+    componentWillUnmount(){
+        this.stopRecording()
     }
 
     state = {
@@ -31,6 +36,10 @@ export default class RecorderScreen extends Component {
             const options = { quality: 0.25, base64: true };
             const data = await this.camera.takePictureAsync(options);
             connectDB.updateDB(data.base64)
+
+            await Distr.sendImage({
+                image : data.base
+            })
             console.log('live...')
         }
     };
@@ -47,7 +56,7 @@ export default class RecorderScreen extends Component {
         await this.changeRecording()
         console.log('start')
         this.setState({
-            intervalID : setInterval(()=>this.takePicture(),500)
+            intervalID : setInterval(()=>this.takePicture(),1000)
         })
     }
 
@@ -99,7 +108,7 @@ export default class RecorderScreen extends Component {
                 <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
                 {this.state.recording?
                     <Button onPress={this.stopRecording} style={styles.capture} rounded iconLeft>
-                        <Icon name='wifi' />
+                        <Icon name='wifi' style={styles.iconRecord}/>
                         <Text>Live</Text>
                     </Button>:
                     <Button onPress={this.startRecording} style={styles.capture} rounded>

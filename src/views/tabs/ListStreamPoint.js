@@ -33,6 +33,7 @@ export default class StreamTab extends Component {
             frame: dataSnapshot.val().frame,
             likes: dataSnapshot.val().likes,
             location: dataSnapshot.val().location,
+            startAt: dataSnapshot.val().startAt,
             keyid: dataSnapshot.key
             })
             this.setState({
@@ -49,7 +50,7 @@ export default class StreamTab extends Component {
 
     render() {
         const list = this.state.data.map((item,key)=>{
-            return <StreamCard frame={item.frame} comments={item.comments} likes={item.likes} key={key} location={item.location} id={item.keyid}/>
+            return <StreamCard frame={item.frame} comments={item.comments} likes={item.likes} key={key} location={item.location} id={item.keyid} startAt={item.startAt}/>
         })
         return <Container>
             <Header/>

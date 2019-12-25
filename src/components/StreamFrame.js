@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Image } from 'react-native';
-import {CardItem} from 'native-base';
+import { Image, StyleSheet } from 'react-native';
+import {CardItem,Text} from 'native-base';
 import {firebaseApp} from '../services/ConfigFirebase';
 
 export default class StreamFrame extends Component {
     
     state={
-        frame : this.props.frame
+        frame : this.props.frame,
+        likes : 0,
     }
 
     constructor(props){
@@ -17,7 +18,8 @@ export default class StreamFrame extends Component {
     componentDidMount(){
         this.itemsRef.on('value',(dataSnapshot)=>{
             this.setState({
-                frame : dataSnapshot.val().frame
+                frame : dataSnapshot.val().frame,
+                likes : dataSnapshot.val().likes
             })
         })
 
@@ -30,3 +32,4 @@ export default class StreamFrame extends Component {
         </CardItem>
     }
 }
+
