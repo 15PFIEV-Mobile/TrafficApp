@@ -7,14 +7,14 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { createAppContainer } from 'react-navigation';
 
 const BottomTab = createBottomTabNavigator({
+  ProfileTabs: {
+    screen : ProfileScreen
+  },
   MapsTab: {
     screen : MapsTabScreen,
   },
   StreamsTab: {
     screen : ListStreamPoint
-  },
-  ProfileTabs: {
-    screen : ProfileScreen
   },
 })
 
