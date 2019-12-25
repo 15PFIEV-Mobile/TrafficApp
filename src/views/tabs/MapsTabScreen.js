@@ -10,8 +10,8 @@ export default class MapsTab extends Component {
         super(props);
         this.state = {
             region: {
-                latitude: 39.78825,
-                longitude: -122.4324,
+                latitude: 16.0586752,
+                longitude: 108.1873099,
                 latitudeDelta: 0.0922,
                 longitudeDelta: 0.0421,
             },
@@ -32,7 +32,7 @@ export default class MapsTab extends Component {
             mark: [{
                 latitude: 0,
                 longitude: 0,
-                total: 0
+                total: 0,
             }]
         };
         this.item = firebaseApp.database().ref('location');
@@ -49,17 +49,27 @@ export default class MapsTab extends Component {
                 latitude: snapshot.val().latitude,
                 longitude: snapshot.val().longitude,
                 total: snapshot.val().total,
+                keyid: snapshot.key
             });
             this.setState({
                 mark: results
             })
+            console.log(this.state.mark);
+        });
+        this.item.on("value", (snapshot) => {
+            console.log(snapshot.val().Pao)
+            // results = results.filter((x)=>(x.keyid==snapshot.key)&&(x.total=snapshot.val().total))
+            results[0] = snapshot.val().Pao
+            this.setState({
+                mark :results,
+            })
+            console.log(this.state.mark);
         });
         
     } 
       
     render() {
         const mark = this.state.mark
-        console.log(mark)
         return (
         <View style={styles.container}>
         <MapView
@@ -76,16 +86,18 @@ export default class MapsTab extends Component {
                 <Image source={require('../../assets/images/Red_Circle_full.png')} style={{height: 35, width:35, opacity: 0.2 }} />
             </Marker>
         ))} */}
+        {this.state.mark.map(point => (
         <Marker
             coordinate = {{
-                latitude: mark[0].latitude, 
-                longitude: mark[0].longitude
+                latitude: point.latitude, 
+                longitude: point.longitude
             }}
             // title={marker.title}
             // description={marker.description}
             >
-                <Image source={require('../../assets/images/Red_Circle_full.png')} style={{height: 35, width:35, opacity: 0.2 }} />
+                <Image source={require('../../assets/images/Red_Circle_full.png')} style={{height: 30, width: 30, opacity: 0.05*point.total }} />
             </Marker>
+        ))}
         </MapView>
         </View>
     );
