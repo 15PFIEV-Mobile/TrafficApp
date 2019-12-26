@@ -33,6 +33,7 @@ export default class MapsTab extends Component {
                 latitude: 0,
                 longitude: 0,
                 total: 0,
+                keyid: 0
             }]
         };
         this.item = firebaseApp.database().ref('location');
@@ -45,25 +46,35 @@ export default class MapsTab extends Component {
     componentDidMount(){
         let results=[];
         this.item.on("child_added", (snapshot) => {
+            console.log("snapshot1: ", snapshot.val());
             results.push({
                 latitude: snapshot.val().latitude,
                 longitude: snapshot.val().longitude,
                 total: snapshot.val().total,
                 keyid: snapshot.key
             });
+            console.log("results2: ",results)
             this.setState({
                 mark: results
-            })
-            console.log(this.state.mark);
+            });
         });
+        
+        console.log("mark: ", this.state.mark);
         this.item.on("value", (snapshot) => {
-            console.log(snapshot.val().Pao)
+            console.log("snapshot2: ", snapshot.val());
             // results = results.filter((x)=>(x.keyid==snapshot.key)&&(x.total=snapshot.val().total))
-            results[0] = snapshot.val().Pao
+            snapshot.forEach(e => {
+                results.forEach( x =>{
+                    if(x.keyid == e.key){
+                        x.total = e.val().total
+                    }
+                })
+                console.log("results3: ",results)                
+            });
             this.setState({
                 mark :results,
             })
-            console.log(this.state.mark);
+            console.log("mark after: ", this.state.mark);
         });
         
     } 
